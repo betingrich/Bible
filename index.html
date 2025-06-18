@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marisel Bible Verse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --primary-color: #3b82f6;
+            --bg-color: #0f172a;
+            --text-light: #f8fafc;
+            --input-bg: #1e293b;
+            --verse-bg: #1e293b;
+            --icon-color: #64748b;
+            --icon-hover: #3b82f6;
+            --whatsapp-color: #25D366;
+            --youtube-color: #FF0000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: #1e293b;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .verified-icon {
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        
+        .channel-btns {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .channel-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .wa-btn:hover {
+            color: var(--whatsapp-color);
+        }
+        
+        .yt-btn:hover {
+            color: var(--youtube-color);
+        }
+        
+        .main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .input-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .input-field {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 24px;
+            outline: none;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: white;
+        }
+        
+        .input-field::placeholder {
+            color: #94a3b8;
+        }
+        
+        #get-verse-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 200px;
+            align-self: center;
+        }
+        
+        #get-verse-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .verse-container {
+            width: 100%;
+            max-width: 600px;
+            min-height: 200px;
+            background-color: var(--verse-bg);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+        
+        .verse-text {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        
+        .verse-reference {
+            font-style: italic;
+            color: var(--primary-color);
+            text-align: right;
+            margin-top: 15px;
+        }
+        
+        .placeholder-text {
+            color: #64748b;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border: none;
+            border-radius: 24px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            background-color: #334155;
+        }
+        
+        .share-link {
+            margin-top: 30px;
+            text-align: center;
+            color: var(--icon-color);
+            font-size: 14px;
+            padding: 0 20px;
+        }
+        
+        .share-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .share-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .recent-verses {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+        
+        .recent-title {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .recent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .recent-item {
+            background-color: var(--verse-bg);
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .recent-item:hover {
+            background-color: #334155;
+        }
+        
+        .recent-reference {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .recent-text {
+            font-size: 14px;
+            margin-top: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 15px;
+            }
+            
+            .verse-text {
+                font-size: 16px;
+            }
+            
+            .verse-container {
+                padding: 20px;
+            }
+            
+            .channel-btns {
+                gap: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .input-field {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">M</div>
+            <h2>Marisel Bible Verse</h2>
+            <i class="fas fa-check-circle verified-icon"></i>
+        </div>
+        <div class="channel-btns">
+            <button class="channel-btn wa-btn" id="whatsapp-btn">
+                <i class="fab fa-whatsapp"></i>
+            </button>
+            <button class="channel-btn yt-btn" id="youtube-btn">
+                <i class="fab fa-youtube"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="main">
+        <div class="input-container">
+            <div class="input-row">
+                <input type="text" id="book-input" class="input-field" placeholder="Book (e.g. John)" autocomplete="off">
+                <input type="text" id="chapter-input" class="input-field" placeholder="Chapter (e.g. 3)" autocomplete="off">
+                <input type="text" id="verse-input" class="input-field" placeholder="Verse (e.g. 16)" autocomplete="off">
+            </div>
+            <button id="get-verse-btn">Get Verse</button>
+        </div>
+        
+        <div class="recent-verses" id="recent-verses">
+            <div class="recent-title">Recently Searched Verses</div>
+            <div class="recent-list" id="recent-list">
+                <div class="recent-item">
+                    <div class="recent-reference">Loading...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="verse-container">
+            <div class="placeholder-text">Enter a Bible reference to display the verse</div>
+            <div class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="verse-text" id="verse-text"></div>
+            <div class="verse-reference" id="verse-reference"></div>
+            
+            <div class="action-buttons" id="action-buttons" style="display: none;">
+                <button class="action-btn" id="copy-btn">
+                    <i class="far fa-copy"></i> Copy
+                </button>
+                <button class="action-btn" id="share-wa-btn">
+                    <i class="fab fa-whatsapp"></i> Share
+                </button>
+            </div>
+            
+            <div class="share-link" id="share-link" style="display: none;">
+                Want to learn more about Christ? Visit <a href="https://bible-eight.vercel.app/" target="_blank">our website</a> for more Bible resources!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bookInput = document.getElementById('book-input');
+            const chapterInput = document.getElementById('chapter-input');
+            const verseInput = document.getElementById('verse-input');
+            const getVerseBtn = document.getElementById('get-verse-btn');
+            const verseText = document.getElementById('verse-text');
+            const verseReference = document.getElementById('verse-reference');
+            const placeholderText = document.querySelector('.placeholder-text');
+            const loadingIndicator = document.querySelector('.loading');
+            const actionButtons = document.getElementById('action-buttons');
+            const shareLink = document.getElementById('share-link');
+            const copyBtn = document.getElementById('copy-btn');
+            const shareWaBtn = document.getElementById('share-wa-btn');
+            const whatsappBtn = document.getElementById('whatsapp-btn');
+            const youtubeBtn = document.getElementById('youtube-btn');
+            const recentList = document.getElementById('recent-list');
+            
+            // Channel links
+            whatsappBtn.addEventListener('click', function() {
+                window.open('https://whatsapp.com/channel/0029Vajvy2kEwEjwAKP4SI0x', '_blank');
+            });
+            
+            youtubeBtn.addEventListener('click', function() {
+                window.open('https://youtube.com/@wemacomic', '_blank');
+            });
+            
+            // Get verse
+            getVerseBtn.addEventListener('click', getBibleVerse);
+            
+            // Also allow Enter key to submit
+            [bookInput, chapterInput, verseInput].forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        getBibleVerse();
+                    }
+                });
+            });
+            
+            // Copy verse
+            copyBtn.addEventListener('click', function() {
+                const verse = verseText.textContent + '\n\n' + verseReference.textContent;
+                navigator.clipboard.writeText(verse);
+                
+                // Change icon temporarily to indicate success
+                const icon = this.querySelector('i');
+                icon.classList.remove('fa-copy');
+                icon.classList.add('fa-check');
+                
+                setTimeout(() => {
+                    icon.classList.remove('fa-check');
+                    icon.classList.add('fa-copy');
+                }, 2000);
+            });
+            
+            // Share to WhatsApp
+            shareWaBtn.addEventListener('click', function() {
+                const verse = verseText.textContent + '\n\n' + verseReference.textContent;
+                const message = encodeURIComponent(
+                    `${verse}\n\nWant to learn more about Christ? Visit https://bible-eight.vercel.app/`
+                );
+                window.open(`https://wa.me/?text=${message}`, '_blank');
+            });
+            
+            // Fetch recent verses
+            async function fetchRecentVerses() {
+                try {
+                    const response = await fetch('http://localhost:3000/api/recent');
+                    const verses = await response.json();
+                    
+                    recentList.innerHTML = '';
+                    
+                    if (verses.length === 0) {
+                        recentList.innerHTML = '<div class="recent-item">No recent searches yet</div>';
+                        return;
+                    }
+                    
+                    verses.forEach(verse => {
+                        const item = document.createElement('div');
+                        item.className = 'recent-item';
+                        item.innerHTML = `
+                            <div class="recent-reference">${verse.reference}</div>
+                            <div class="recent-text">${verse.text}</div>
+                        `;
+                        
+                        // Click handler to load the verse
+                        item.addEventListener('click', () => {
+                            const [book, chapterVerse] = verse.reference.split(' ');
+                            const [chapter, verseNum] = chapterVerse.split(':');
+                            
+                            bookInput.value = book;
+                            chapterInput.value = chapter;
+                            verseInput.value = verseNum;
+                            
+                            getBibleVerse();
+                        });
+                        
+                        recentList.appendChild(item);
+                    });
+                } catch (error) {
+                    console.error('Error fetching recent verses:', error);
+                    recentList.innerHTML = '<div class="recent-item">Error loading recent verses</div>';
+                }
+            }
+            
+            async function getBibleVerse() {
+                const book = bookInput.value.trim();
+                const chapter = chapterInput.value.trim();
+                const verse = verseInput.value.trim();
+                
+                if (!book || !chapter || !verse) {
+                    alert('Please enter book, chapter, and verse');
+                    return;
+                }
+                
+                // Show loading state
+                placeholderText.style.display = 'none';
+                verseText.style.display = 'none';
+                verseReference.style.display = 'none';
+                actionButtons.style.display = 'none';
+                shareLink.style.display = 'none';
+                loadingIndicator.style.display = 'flex';
+                
+                try {
+                    const response = await fetch(`http://localhost:3000/api/verse?book=${encodeURIComponent(book)}&chapter=${encodeURIComponent(chapter)}&verse=${encodeURIComponent(verse)}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.text && data.reference) {
+                        verseText.textContent = data.text;
+                        verseReference.textContent = `— ${data.reference}`;
+                        verseText.style.display = 'block';
+                        verseReference.style.display = 'block';
+                        actionButtons.style.display = 'flex';
+                        shareLink.style.display = 'block';
+                        placeholderText.style.display = 'none';
+                        
+                        // Refresh recent verses
+                        await fetchRecentVerses();
+                    } else {
+                        throw new Error("No verse text in response");
+                    }
+                } catch (error) {
+                    console.error('Error fetching Bible verse:', error);
+                    placeholderText.textContent = "Failed to fetch verse. Please try again.";
+                    placeholderText.style.display = 'block';
+                    actionButtons.style.display = 'none';
+                    shareLink.style.display = 'none';
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+            
+            // Initial load
+            fetchRecentVerses();
+        });
+    </script>
+</body>
+  </html>
