@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marisel AI Image Generator</title>
+    <title>Marisel Bible Verse</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
@@ -13,6 +13,7 @@
             --bg-color: #0f172a;
             --text-light: #f8fafc;
             --input-bg: #1e293b;
+            --verse-bg: #1e293b;
         }
         
         * {
@@ -75,10 +76,16 @@
             width: 100%;
             max-width: 600px;
             display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .input-row {
+            display: flex;
             gap: 10px;
         }
         
-        #prompt-input {
+        .input-field {
             flex: 1;
             padding: 12px 20px;
             border: none;
@@ -89,42 +96,49 @@
             color: white;
         }
         
-        #prompt-input::placeholder {
+        .input-field::placeholder {
             color: #94a3b8;
         }
         
-        #generate-btn {
+        #get-verse-btn {
             background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 24px;
-            padding: 0 25px;
+            padding: 12px 25px;
             cursor: pointer;
             font-size: 16px;
             transition: all 0.2s;
+            margin-top: 10px;
         }
         
-        #generate-btn:hover {
+        #get-verse-btn:hover {
             opacity: 0.9;
         }
         
-        .image-container {
+        .verse-container {
             width: 100%;
-            max-width: 512px;
-            min-height: 300px;
-            background-color: #1e293b;
+            max-width: 600px;
+            min-height: 200px;
+            background-color: var(--verse-bg);
             border-radius: 12px;
+            padding: 25px;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            flex-direction: column;
+            gap: 15px;
             position: relative;
         }
         
-        #generated-image {
-            max-width: 100%;
-            max-height: 512px;
-            display: none;
+        .verse-text {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        
+        .verse-reference {
+            font-style: italic;
+            color: var(--primary-color);
+            text-align: right;
+            margin-top: 15px;
         }
         
         .placeholder-text {
@@ -136,6 +150,9 @@
         .loading {
             display: none;
             position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         .loading-spinner {
@@ -150,113 +167,79 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
-        .model-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .model-btn {
-            padding: 8px 15px;
-            border-radius: 20px;
-            background-color: #1e293b;
-            color: white;
-            border: 1px solid #334155;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        
-        .model-btn.active {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo-container">
             <div class="logo">M</div>
-            <h2>Marisel AI Image Generator</h2>
+            <h2>Marisel Bible Verse</h2>
             <i class="fas fa-check-circle verified-icon"></i>
         </div>
     </div>
     
     <div class="main">
-        <div class="model-selector">
-            <button class="model-btn active" data-model="fluxpro">Flux Pro</button>
-            <button class="model-btn" data-model="flux">Flux</button>
-            <button class="model-btn" data-model="google">Google</button>
-        </div>
-        
         <div class="input-container">
-            <input type="text" id="prompt-input" placeholder="Describe the image you want to generate..." autocomplete="off">
-            <button id="generate-btn">Generate</button>
+            <div class="input-row">
+                <input type="text" id="book-input" class="input-field" placeholder="Book (e.g. John)" autocomplete="off">
+                <input type="text" id="chapter-input" class="input-field" placeholder="Chapter (e.g. 3)" autocomplete="off">
+                <input type="text" id="verse-input" class="input-field" placeholder="Verse (e.g. 16)" autocomplete="off">
+            </div>
+            <button id="get-verse-btn">Get Verse</button>
         </div>
         
-        <div class="image-container">
-            <div class="placeholder-text">Your generated image will appear here</div>
+        <div class="verse-container">
+            <div class="placeholder-text">Enter a Bible reference to display the verse</div>
             <div class="loading">
                 <div class="loading-spinner"></div>
             </div>
-            <img id="generated-image" alt="Generated image">
+            <div class="verse-text" id="verse-text"></div>
+            <div class="verse-reference" id="verse-reference"></div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const promptInput = document.getElementById('prompt-input');
-            const generateBtn = document.getElementById('generate-btn');
-            const imageContainer = document.querySelector('.image-container');
-            const generatedImage = document.getElementById('generated-image');
+            const bookInput = document.getElementById('book-input');
+            const chapterInput = document.getElementById('chapter-input');
+            const verseInput = document.getElementById('verse-input');
+            const getVerseBtn = document.getElementById('get-verse-btn');
+            const verseText = document.getElementById('verse-text');
+            const verseReference = document.getElementById('verse-reference');
             const placeholderText = document.querySelector('.placeholder-text');
             const loadingIndicator = document.querySelector('.loading');
-            const modelButtons = document.querySelectorAll('.model-btn');
             
-            let currentModel = 'fluxpro';
+            // Get verse
+            getVerseBtn.addEventListener('click', getBibleVerse);
             
-            // Model selection
-            modelButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    modelButtons.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentModel = this.dataset.model;
+            // Also allow Enter key to submit
+            [bookInput, chapterInput, verseInput].forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        getBibleVerse();
+                    }
                 });
             });
             
-            // Generate image
-            generateBtn.addEventListener('click', generateImage);
-            promptInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    generateImage();
+            async function getBibleVerse() {
+                const book = bookInput.value.trim();
+                const chapter = chapterInput.value.trim();
+                const verse = verseInput.value.trim();
+                
+                if (!book || !chapter || !verse) {
+                    alert('Please enter book, chapter, and verse');
+                    return;
                 }
-            });
-            
-            async function generateImage() {
-                const prompt = promptInput.value.trim();
-                if (!prompt) return;
                 
                 // Show loading state
                 placeholderText.style.display = 'none';
+                verseText.style.display = 'none';
+                verseReference.style.display = 'none';
                 loadingIndicator.style.display = 'flex';
-                generatedImage.style.display = 'none';
                 
                 try {
-                    let apiUrl;
-                    const encodedPrompt = encodeURIComponent(prompt);
-                    
-                    switch(currentModel) {
-                        case 'fluxpro':
-                            apiUrl = `https://apis.davidcyriltech.my.id/fluxpro?prompt=${encodedPrompt}`;
-                            break;
-                        case 'flux':
-                            apiUrl = `https://apis.davidcyriltech.my.id/flux?prompt=${encodedPrompt}`;
-                            break;
-                        case 'google':
-                            apiUrl = `https://apis.davidcyriltech.my.id/googleimage?query=${encodedPrompt}`;
-                            break;
-                    }
+                    const reference = `${book}+${chapter}:${verse}`;
+                    const apiUrl = `https://apis.davidcyriltech.my.id/bible?reference=${encodeURIComponent(reference)}`;
                     
                     const response = await fetch(apiUrl);
                     
@@ -266,16 +249,18 @@
                     
                     const data = await response.json();
                     
-                    if (data.image || data.url) {
-                        generatedImage.src = data.image || data.url;
-                        generatedImage.style.display = 'block';
+                    if (data.text && data.reference) {
+                        verseText.textContent = data.text;
+                        verseReference.textContent = `— ${data.reference}`;
+                        verseText.style.display = 'block';
+                        verseReference.style.display = 'block';
                         placeholderText.style.display = 'none';
                     } else {
-                        throw new Error("No image URL in response");
+                        throw new Error("No verse text in response");
                     }
                 } catch (error) {
-                    console.error('Error generating image:', error);
-                    placeholderText.textContent = "Failed to generate image. Please try again.";
+                    console.error('Error fetching Bible verse:', error);
+                    placeholderText.textContent = "Failed to fetch verse. Please try again.";
                     placeholderText.style.display = 'block';
                 } finally {
                     loadingIndicator.style.display = 'none';
