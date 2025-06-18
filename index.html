@@ -14,6 +14,10 @@
             --text-light: #f8fafc;
             --input-bg: #1e293b;
             --verse-bg: #1e293b;
+            --icon-color: #64748b;
+            --icon-hover: #3b82f6;
+            --whatsapp-color: #25D366;
+            --youtube-color: #FF0000;
         }
         
         * {
@@ -26,7 +30,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-light);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
@@ -38,6 +42,9 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .logo-container {
@@ -63,6 +70,28 @@
             font-size: 16px;
         }
         
+        .channel-btns {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .channel-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .wa-btn:hover {
+            color: var(--whatsapp-color);
+        }
+        
+        .yt-btn:hover {
+            color: var(--youtube-color);
+        }
+        
         .main {
             flex: 1;
             padding: 20px;
@@ -83,10 +112,12 @@
         .input-row {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .input-field {
             flex: 1;
+            min-width: 120px;
             padding: 12px 20px;
             border: none;
             border-radius: 24px;
@@ -110,6 +141,9 @@
             font-size: 16px;
             transition: all 0.2s;
             margin-top: 10px;
+            width: 100%;
+            max-width: 200px;
+            align-self: center;
         }
         
         #get-verse-btn:hover {
@@ -167,6 +201,78 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border: none;
+            border-radius: 24px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            background-color: #334155;
+        }
+        
+        .share-link {
+            margin-top: 30px;
+            text-align: center;
+            color: var(--icon-color);
+            font-size: 14px;
+            padding: 0 20px;
+        }
+        
+        .share-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .share-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 15px;
+            }
+            
+            .verse-text {
+                font-size: 16px;
+            }
+            
+            .verse-container {
+                padding: 20px;
+            }
+            
+            .channel-btns {
+                gap: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .input-field {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -175,6 +281,14 @@
             <div class="logo">M</div>
             <h2>Marisel Bible Verse</h2>
             <i class="fas fa-check-circle verified-icon"></i>
+        </div>
+        <div class="channel-btns">
+            <button class="channel-btn wa-btn" id="whatsapp-btn">
+                <i class="fab fa-whatsapp"></i>
+            </button>
+            <button class="channel-btn yt-btn" id="youtube-btn">
+                <i class="fab fa-youtube"></i>
+            </button>
         </div>
     </div>
     
@@ -195,6 +309,19 @@
             </div>
             <div class="verse-text" id="verse-text"></div>
             <div class="verse-reference" id="verse-reference"></div>
+            
+            <div class="action-buttons" id="action-buttons" style="display: none;">
+                <button class="action-btn" id="copy-btn">
+                    <i class="far fa-copy"></i> Copy
+                </button>
+                <button class="action-btn" id="share-wa-btn">
+                    <i class="fab fa-whatsapp"></i> Share
+                </button>
+            </div>
+            
+            <div class="share-link" id="share-link" style="display: none;">
+                Want to learn more about Christ? Visit <a href="https://bible-eight.vercel.app/" target="_blank">our website</a> for more Bible resources!
+            </div>
         </div>
     </div>
 
@@ -208,6 +335,21 @@
             const verseReference = document.getElementById('verse-reference');
             const placeholderText = document.querySelector('.placeholder-text');
             const loadingIndicator = document.querySelector('.loading');
+            const actionButtons = document.getElementById('action-buttons');
+            const shareLink = document.getElementById('share-link');
+            const copyBtn = document.getElementById('copy-btn');
+            const shareWaBtn = document.getElementById('share-wa-btn');
+            const whatsappBtn = document.getElementById('whatsapp-btn');
+            const youtubeBtn = document.getElementById('youtube-btn');
+            
+            // Channel links
+            whatsappBtn.addEventListener('click', function() {
+                window.open('https://whatsapp.com/channel/0029Vajvy2kEwEjwAKP4SI0x', '_blank');
+            });
+            
+            youtubeBtn.addEventListener('click', function() {
+                window.open('https://youtube.com/@wemacomic', '_blank');
+            });
             
             // Get verse
             getVerseBtn.addEventListener('click', getBibleVerse);
@@ -219,6 +361,31 @@
                         getBibleVerse();
                     }
                 });
+            });
+            
+            // Copy verse
+            copyBtn.addEventListener('click', function() {
+                const verse = verseText.textContent + '\n\n' + verseReference.textContent;
+                navigator.clipboard.writeText(verse);
+                
+                // Change icon temporarily to indicate success
+                const icon = this.querySelector('i');
+                icon.classList.remove('fa-copy');
+                icon.classList.add('fa-check');
+                
+                setTimeout(() => {
+                    icon.classList.remove('fa-check');
+                    icon.classList.add('fa-copy');
+                }, 2000);
+            });
+            
+            // Share to WhatsApp
+            shareWaBtn.addEventListener('click', function() {
+                const verse = verseText.textContent + '\n\n' + verseReference.textContent;
+                const message = encodeURIComponent(
+                    `${verse}\n\nWant to learn more about Christ? Visit https://bible-eight.vercel.app/`
+                );
+                window.open(`https://wa.me/?text=${message}`, '_blank');
             });
             
             async function getBibleVerse() {
@@ -235,6 +402,8 @@
                 placeholderText.style.display = 'none';
                 verseText.style.display = 'none';
                 verseReference.style.display = 'none';
+                actionButtons.style.display = 'none';
+                shareLink.style.display = 'none';
                 loadingIndicator.style.display = 'flex';
                 
                 try {
@@ -254,6 +423,8 @@
                         verseReference.textContent = `— ${data.reference}`;
                         verseText.style.display = 'block';
                         verseReference.style.display = 'block';
+                        actionButtons.style.display = 'flex';
+                        shareLink.style.display = 'block';
                         placeholderText.style.display = 'none';
                     } else {
                         throw new Error("No verse text in response");
@@ -262,6 +433,8 @@
                     console.error('Error fetching Bible verse:', error);
                     placeholderText.textContent = "Failed to fetch verse. Please try again.";
                     placeholderText.style.display = 'block';
+                    actionButtons.style.display = 'none';
+                    shareLink.style.display = 'none';
                 } finally {
                     loadingIndicator.style.display = 'none';
                 }
