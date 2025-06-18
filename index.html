@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marisel AI Image Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --primary-color: #3b82f6;
+            --bg-color: #0f172a;
+            --text-light: #f8fafc;
+            --input-bg: #1e293b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: #1e293b;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .verified-icon {
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        
+        .main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .input-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        #prompt-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 24px;
+            outline: none;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: white;
+        }
+        
+        #prompt-input::placeholder {
+            color: #94a3b8;
+        }
+        
+        #generate-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 0 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        #generate-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .image-container {
+            width: 100%;
+            max-width: 512px;
+            min-height: 300px;
+            background-color: #1e293b;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #generated-image {
+            max-width: 100%;
+            max-height: 512px;
+            display: none;
+        }
+        
+        .placeholder-text {
+            color: #64748b;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading {
+            display: none;
+            position: absolute;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .model-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .model-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: #1e293b;
+            color: white;
+            border: 1px solid #334155;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .model-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">M</div>
+            <h2>Marisel AI Image Generator</h2>
+            <i class="fas fa-check-circle verified-icon"></i>
+        </div>
+    </div>
+    
+    <div class="main">
+        <div class="model-selector">
+            <button class="model-btn active" data-model="fluxpro">Flux Pro</button>
+            <button class="model-btn" data-model="flux">Flux</button>
+            <button class="model-btn" data-model="google">Google</button>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="prompt-input" placeholder="Describe the image you want to generate..." autocomplete="off">
+            <button id="generate-btn">Generate</button>
+        </div>
+        
+        <div class="image-container">
+            <div class="placeholder-text">Your generated image will appear here</div>
+            <div class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+            <img id="generated-image" alt="Generated image">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const promptInput = document.getElementById('prompt-input');
+            const generateBtn = document.getElementById('generate-btn');
+            const imageContainer = document.querySelector('.image-container');
+            const generatedImage = document.getElementById('generated-image');
+            const placeholderText = document.querySelector('.placeholder-text');
+            const loadingIndicator = document.querySelector('.loading');
+            const modelButtons = document.querySelectorAll('.model-btn');
+            
+            let currentModel = 'fluxpro';
+            
+            // Model selection
+            modelButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    modelButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentModel = this.dataset.model;
+                });
+            });
+            
+            // Generate image
+            generateBtn.addEventListener('click', generateImage);
+            promptInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    generateImage();
+                }
+            });
+            
+            async function generateImage() {
+                const prompt = promptInput.value.trim();
+                if (!prompt) return;
+                
+                // Show loading state
+                placeholderText.style.display = 'none';
+                loadingIndicator.style.display = 'flex';
+                generatedImage.style.display = 'none';
+                
+                try {
+                    let apiUrl;
+                    const encodedPrompt = encodeURIComponent(prompt);
+                    
+                    switch(currentModel) {
+                        case 'fluxpro':
+                            apiUrl = `https://apis.davidcyriltech.my.id/fluxpro?prompt=${encodedPrompt}`;
+                            break;
+                        case 'flux':
+                            apiUrl = `https://apis.davidcyriltech.my.id/flux?prompt=${encodedPrompt}`;
+                            break;
+                        case 'google':
+                            apiUrl = `https://apis.davidcyriltech.my.id/googleimage?query=${encodedPrompt}`;
+                            break;
+                    }
+                    
+                    const response = await fetch(apiUrl);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.image || data.url) {
+                        generatedImage.src = data.image || data.url;
+                        generatedImage.style.display = 'block';
+                        placeholderText.style.display = 'none';
+                    } else {
+                        throw new Error("No image URL in response");
+                    }
+                } catch (error) {
+                    console.error('Error generating image:', error);
+                    placeholderText.textContent = "Failed to generate image. Please try again.";
+                    placeholderText.style.display = 'block';
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
