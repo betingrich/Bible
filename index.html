@@ -9,15 +9,16 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
         
         :root {
-            --primary-color: #3b82f6;
-            --bg-color: #0f172a;
+            --primary-color: #00b4d8; /* Sky blue */
+            --bg-color: #0f172a; /* Dark black */
             --text-light: #f8fafc;
             --input-bg: #1e293b;
-            --verse-bg: #1e293b;
+            --verse-bg: rgba(30, 41, 59, 0.7); /* Semi-transparent for glass effect */
             --icon-color: #64748b;
-            --icon-hover: #3b82f6;
+            --icon-hover: #00b4d8;
             --whatsapp-color: #25D366;
             --youtube-color: #FF0000;
+            --like-color: #ff6b6b;
         }
         
         * {
@@ -33,10 +34,14 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background-image: url('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
         
         .header {
-            background-color: #1e293b;
+            background-color: rgba(30, 41, 59, 0.8);
             padding: 15px 20px;
             display: flex;
             align-items: center;
@@ -45,6 +50,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            backdrop-filter: blur(10px);
         }
         
         .logo-container {
@@ -115,18 +121,6 @@
             flex-wrap: wrap;
         }
         
-        .input-field {
-            flex: 1;
-            min-width: 120px;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 24px;
-            outline: none;
-            font-size: 16px;
-            background-color: var(--input-bg);
-            color: white;
-        }
-        
         #book-select {
             flex: 1;
             min-width: 120px;
@@ -144,6 +138,18 @@
             background-repeat: no-repeat;
             background-position: right 15px center;
             background-size: 15px;
+        }
+        
+        .input-field {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 24px;
+            outline: none;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: white;
         }
         
         .input-field::placeholder {
@@ -167,6 +173,7 @@
         
         #get-verse-btn:hover {
             opacity: 0.9;
+            transform: translateY(-2px);
         }
         
         .verse-container {
@@ -180,6 +187,9 @@
             flex-direction: column;
             gap: 15px;
             position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
         }
         
         .verse-text {
@@ -195,7 +205,7 @@
         }
         
         .placeholder-text {
-            color: #64748b;
+            color: #94a3b8;
             text-align: center;
             padding: 20px;
         }
@@ -247,6 +257,14 @@
             background-color: #334155;
         }
         
+        .action-btn.liked {
+            color: var(--like-color);
+        }
+        
+        .action-btn.liked i {
+            color: var(--like-color);
+        }
+        
         .share-link {
             margin-top: 30px;
             text-align: center;
@@ -264,16 +282,62 @@
             text-decoration: underline;
         }
         
+        .random-verse {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            background-color: var(--verse-bg);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+        }
+        
+        .random-verse-title {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .random-verse-content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .random-verse-ref {
+            font-style: italic;
+            color: var(--primary-color);
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        .like-btn {
+            background: none;
+            border: none;
+            color: var(--icon-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+        
+        .like-btn.liked {
+            color: var(--like-color);
+        }
+        
         @media (max-width: 768px) {
             .header {
                 padding: 12px 15px;
             }
             
-            .verse-text {
+            .verse-text, .random-verse-content {
                 font-size: 16px;
             }
             
-            .verse-container {
+            .verse-container, .random-verse {
                 padding: 20px;
             }
             
@@ -324,6 +388,17 @@
             <button id="get-verse-btn">Get Verse</button>
         </div>
         
+        <div class="random-verse" id="random-verse">
+            <div class="random-verse-title">
+                Verse of the Moment
+                <button class="like-btn" id="random-like-btn">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+            <div class="random-verse-content" id="random-verse-text"></div>
+            <div class="random-verse-ref" id="random-verse-ref"></div>
+        </div>
+        
         <div class="verse-container">
             <div class="placeholder-text">Enter a Bible reference to display the verse</div>
             <div class="loading">
@@ -335,6 +410,9 @@
             <div class="action-buttons" id="action-buttons" style="display: none;">
                 <button class="action-btn" id="copy-btn">
                     <i class="far fa-copy"></i> Copy
+                </button>
+                <button class="action-btn" id="like-btn">
+                    <i class="far fa-heart"></i> Like
                 </button>
                 <button class="action-btn" id="share-wa-btn">
                     <i class="fab fa-whatsapp"></i> Share
@@ -360,9 +438,13 @@
             const actionButtons = document.getElementById('action-buttons');
             const shareLink = document.getElementById('share-link');
             const copyBtn = document.getElementById('copy-btn');
+            const likeBtn = document.getElementById('like-btn');
             const shareWaBtn = document.getElementById('share-wa-btn');
             const whatsappBtn = document.getElementById('whatsapp-btn');
             const youtubeBtn = document.getElementById('youtube-btn');
+            const randomVerseText = document.getElementById('random-verse-text');
+            const randomVerseRef = document.getElementById('random-verse-ref');
+            const randomLikeBtn = document.getElementById('random-like-btn');
             
             // List of all Bible books
             const bibleBooks = [
@@ -382,6 +464,38 @@
                 "Revelation"
             ];
             
+            // Popular Bible verses for random display
+            const popularVerses = [
+                {
+                    text: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.",
+                    reference: "John 3:16"
+                },
+                {
+                    text: "Trust in the LORD with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.",
+                    reference: "Proverbs 3:5-6"
+                },
+                {
+                    text: "I can do all this through him who gives me strength.",
+                    reference: "Philippians 4:13"
+                },
+                {
+                    text: "The LORD is my shepherd, I lack nothing.",
+                    reference: "Psalm 23:1"
+                },
+                {
+                    text: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.",
+                    reference: "Philippians 4:6"
+                },
+                {
+                    text: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.",
+                    reference: "Romans 8:28"
+                },
+                {
+                    text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the LORD your God will be with you wherever you go.",
+                    reference: "Joshua 1:9"
+                }
+            ];
+            
             // Populate book select dropdown
             bibleBooks.forEach(book => {
                 const option = document.createElement('option');
@@ -389,6 +503,36 @@
                 option.textContent = book;
                 bookSelect.appendChild(option);
             });
+            
+            // Display random verse
+            function showRandomVerse() {
+                const randomVerse = popularVerses[Math.floor(Math.random() * popularVerses.length)];
+                randomVerseText.textContent = randomVerse.text;
+                randomVerseRef.textContent = randomVerse.reference;
+            }
+            
+            // Initialize random verse
+            showRandomVerse();
+            
+            // Like button functionality
+            function setupLikeButton(button) {
+                button.addEventListener('click', function() {
+                    this.classList.toggle('liked');
+                    const icon = this.querySelector('i');
+                    icon.classList.toggle('fa-heart');
+                    icon.classList.toggle('fa-solid');
+                    icon.classList.toggle('far');
+                    
+                    if (this.classList.contains('liked')) {
+                        icon.style.color = 'var(--like-color)';
+                    } else {
+                        icon.style.color = '';
+                    }
+                });
+            }
+            
+            setupLikeButton(randomLikeBtn);
+            setupLikeButton(likeBtn);
             
             // Channel links
             whatsappBtn.addEventListener('click', function() {
@@ -427,74 +571,4 @@
                 }, 2000);
             });
             
-            // Share to WhatsApp with bold formatting
-            shareWaBtn.addEventListener('click', function() {
-                const verse = verseText.textContent;
-                const reference = verseReference.textContent;
-                
-                // Format text with WhatsApp bold syntax
-                const formattedVerse = verse.split(' ').map(word => 
-                    word.length > 3 ? `*${word}*` : word
-                ).join(' ');
-                
-                const message = encodeURIComponent(
-                    `${formattedVerse}\n\n${reference}\n\nWant to learn more about Christ? Visit https://bible-eight.vercel.app/`
-                );
-                window.open(`https://wa.me/?text=${message}`, '_blank');
-            });
-            
-            async function getBibleVerse() {
-                const book = bookSelect.value;
-                const chapter = chapterInput.value.trim();
-                const verse = verseInput.value.trim();
-                
-                if (!book || !chapter || !verse) {
-                    alert('Please select a book and enter chapter and verse');
-                    return;
-                }
-                
-                // Show loading state
-                placeholderText.style.display = 'none';
-                verseText.style.display = 'none';
-                verseReference.style.display = 'none';
-                actionButtons.style.display = 'none';
-                shareLink.style.display = 'none';
-                loadingIndicator.style.display = 'flex';
-                
-                try {
-                    const reference = `${book}+${chapter}:${verse}`;
-                    const apiUrl = `https://apis.davidcyriltech.my.id/bible?reference=${encodeURIComponent(reference)}`;
-                    
-                    const response = await fetch(apiUrl);
-                    
-                    if (!response.ok) {
-                        throw new Error(`API request failed with status ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (data.text && data.reference) {
-                        verseText.textContent = data.text;
-                        verseReference.textContent = `— ${data.reference}`;
-                        verseText.style.display = 'block';
-                        verseReference.style.display = 'block';
-                        actionButtons.style.display = 'flex';
-                        shareLink.style.display = 'block';
-                        placeholderText.style.display = 'none';
-                    } else {
-                        throw new Error("No verse text in response");
-                    }
-                } catch (error) {
-                    console.error('Error fetching Bible verse:', error);
-                    placeholderText.textContent = "Failed to fetch verse. Please try again.";
-                    placeholderText.style.display = 'block';
-                    actionButtons.style.display = 'none';
-                    shareLink.style.display = 'none';
-                } finally {
-                    loadingIndicator.style.display = 'none';
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+            // Share to WhatsApp with bold
