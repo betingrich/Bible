@@ -127,6 +127,25 @@
             color: white;
         }
         
+        #book-select {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 24px;
+            outline: none;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: white;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+        }
+        
         .input-field::placeholder {
             color: #94a3b8;
         }
@@ -269,7 +288,7 @@
                 gap: 10px;
             }
             
-            .input-field {
+            .input-field, #book-select {
                 width: 100%;
             }
         }
@@ -295,7 +314,10 @@
     <div class="main">
         <div class="input-container">
             <div class="input-row">
-                <input type="text" id="book-input" class="input-field" placeholder="Book (e.g. John)" autocomplete="off">
+                <select id="book-select" class="input-field">
+                    <option value="" disabled selected>Select Book</option>
+                    <!-- Books will be added by JavaScript -->
+                </select>
                 <input type="text" id="chapter-input" class="input-field" placeholder="Chapter (e.g. 3)" autocomplete="off">
                 <input type="text" id="verse-input" class="input-field" placeholder="Verse (e.g. 16)" autocomplete="off">
             </div>
@@ -327,7 +349,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const bookInput = document.getElementById('book-input');
+            const bookSelect = document.getElementById('book-select');
             const chapterInput = document.getElementById('chapter-input');
             const verseInput = document.getElementById('verse-input');
             const getVerseBtn = document.getElementById('get-verse-btn');
@@ -342,6 +364,32 @@
             const whatsappBtn = document.getElementById('whatsapp-btn');
             const youtubeBtn = document.getElementById('youtube-btn');
             
+            // List of all Bible books
+            const bibleBooks = [
+                "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",
+                "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel",
+                "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra",
+                "Nehemiah", "Esther", "Job", "Psalms", "Proverbs",
+                "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah", "Lamentations",
+                "Ezekiel", "Daniel", "Hosea", "Joel", "Amos",
+                "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk",
+                "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew",
+                "Mark", "Luke", "John", "Acts", "Romans",
+                "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians",
+                "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy",
+                "Titus", "Philemon", "Hebrews", "James", "1 Peter",
+                "2 Peter", "1 John", "2 John", "3 John", "Jude",
+                "Revelation"
+            ];
+            
+            // Populate book select dropdown
+            bibleBooks.forEach(book => {
+                const option = document.createElement('option');
+                option.value = book;
+                option.textContent = book;
+                bookSelect.appendChild(option);
+            });
+            
             // Channel links
             whatsappBtn.addEventListener('click', function() {
                 window.open('https://whatsapp.com/channel/0029Vajvy2kEwEjwAKP4SI0x', '_blank');
@@ -355,7 +403,7 @@
             getVerseBtn.addEventListener('click', getBibleVerse);
             
             // Also allow Enter key to submit
-            [bookInput, chapterInput, verseInput].forEach(input => {
+            [bookSelect, chapterInput, verseInput].forEach(input => {
                 input.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         getBibleVerse();
@@ -379,22 +427,29 @@
                 }, 2000);
             });
             
-            // Share to WhatsApp
+            // Share to WhatsApp with bold formatting
             shareWaBtn.addEventListener('click', function() {
-                const verse = verseText.textContent + '\n\n' + verseReference.textContent;
+                const verse = verseText.textContent;
+                const reference = verseReference.textContent;
+                
+                // Format text with WhatsApp bold syntax
+                const formattedVerse = verse.split(' ').map(word => 
+                    word.length > 3 ? `*${word}*` : word
+                ).join(' ');
+                
                 const message = encodeURIComponent(
-                    `${verse}\n\nWant to learn more about Christ? Visit https://bible-eight.vercel.app/`
+                    `${formattedVerse}\n\n${reference}\n\nWant to learn more about Christ? Visit https://bible-eight.vercel.app/`
                 );
                 window.open(`https://wa.me/?text=${message}`, '_blank');
             });
             
             async function getBibleVerse() {
-                const book = bookInput.value.trim();
+                const book = bookSelect.value;
                 const chapter = chapterInput.value.trim();
                 const verse = verseInput.value.trim();
                 
                 if (!book || !chapter || !verse) {
-                    alert('Please enter book, chapter, and verse');
+                    alert('Please select a book and enter chapter and verse');
                     return;
                 }
                 
