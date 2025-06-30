@@ -891,7 +891,7 @@
                 ).join(' ');
                 
                 const message = encodeURIComponent(
-                    `*${formattedVerse}*\n_${reference}_\n\n*Want to learn more about Christ? Visit https://bible-eight.vercel.app/*`
+                    `${formattedVerse}\n_${reference}_\n\n*Want to learn more about Christ? Visit https://bible-eight.vercel.app/*`
                 );
                 window.open(`https://wa.me/?text=${message}`, '_blank');
             });
