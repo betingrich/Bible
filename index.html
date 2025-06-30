@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Read Bible</title>
+    <title>Bible Today</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
         
         :root {
             --primary-color: #3b82f6;
-            --bg-color: #0f172a;
             --text-light: #f8fafc;
-            --input-bg: rgba(30, 41, 59, 0.7);
-            --verse-bg: rgba(30, 41, 59, 0.7);
             --icon-color: #64748b;
             --icon-hover: #3b82f6;
             --whatsapp-color: #25D366;
             --youtube-color: #FF0000;
-            --glass-blur: 10px;
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-blur: 16px;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
         
         * {
@@ -29,32 +28,176 @@
             font-family: 'Poppins', sans-serif;
         }
         
+        html {
+            scroll-behavior: smooth;
+        }
+        
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63);
             color: var(--text-light);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+        
+        /* Video Background */
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.8;
         }
         
         /* LiquidGlass Design Elements */
         .glass {
-            background: var(--input-bg);
+            background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border: var(--glass-border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--glass-shadow);
+            border-radius: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-btn {
+            background: rgba(59, 130, 246, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            color: white;
+            border-radius: 24px;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-btn:hover {
+            background: rgba(59, 130, 246, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Page Container */
+        .page {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        /* Feeling Page */
+        #feeling-page {
+            z-index: 10;
+        }
+        
+        .feeling-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .feeling-title {
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .feeling-subtitle {
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .feeling-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        @media (max-width: 600px) {
+            .feeling-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .feeling-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .feeling-option:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .feeling-emoji {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+        
+        .feeling-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Comfort Verse Display */
+        .comfort-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+        }
+        
+        .comfort-text {
+            font-size: 20px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+        
+        .comfort-reference {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-top: 15px;
+        }
+        
+        /* Bible Page */
+        #bible-page {
+            display: none;
+            z-index: 5;
         }
         
         .header {
+            width: 100%;
+            max-width: 800px;
             padding: 15px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            margin-bottom: 20px;
         }
         
         .logo-container {
@@ -73,11 +216,6 @@
             justify-content: center;
             font-weight: bold;
             color: white;
-        }
-        
-        .verified-icon {
-            color: var(--primary-color);
-            font-size: 16px;
         }
         
         .channel-btns {
@@ -102,15 +240,6 @@
             color: var(--youtube-color);
         }
         
-        .main {
-            flex: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        
         .input-container {
             width: 100%;
             max-width: 600px;
@@ -130,10 +259,13 @@
             min-width: 120px;
             padding: 12px 20px;
             border: none;
-            border-radius: 24px;
+            border-radius: 18px;
             outline: none;
             font-size: 16px;
-            background-color: var(--input-bg);
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: var(--glass-border);
             color: white;
         }
         
@@ -141,11 +273,13 @@
             flex: 1;
             min-width: 120px;
             padding: 12px 20px;
-            border: none;
-            border-radius: 24px;
+            border-radius: 18px;
             outline: none;
             font-size: 16px;
-            background-color: var(--input-bg);
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: var(--glass-border);
             color: white;
             appearance: none;
             -webkit-appearance: none;
@@ -160,31 +294,11 @@
             color: #94a3b8;
         }
         
-        #get-verse-btn, #feeling-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 24px;
-            padding: 12px 25px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-            margin-top: 10px;
-            width: 100%;
-            max-width: 200px;
-            align-self: center;
-        }
-        
-        #get-verse-btn:hover, #feeling-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
         .verse-container {
             width: 100%;
             max-width: 600px;
             min-height: 200px;
-            border-radius: 12px;
+            border-radius: 18px;
             padding: 25px;
             display: flex;
             flex-direction: column;
@@ -240,76 +354,63 @@
         }
         
         .action-btn {
-            background-color: var(--input-bg);
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: var(--glass-border);
             color: var(--text-light);
-            border: none;
-            border-radius: 24px;
-            padding: 8px 15px;
+            border-radius: 18px;
+            padding: 10px 20px;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
         .action-btn:hover {
-            background-color: rgba(51, 65, 85, 0.7);
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
         }
         
-        .share-link {
-            margin-top: 30px;
+        /* Footer */
+        .footer {
+            width: 100%;
+            padding: 15px;
             text-align: center;
-            color: var(--icon-color);
             font-size: 14px;
-            padding: 0 20px;
-        }
-        
-        .share-link a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        
-        .share-link a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Time and Date Display */
-        .time-date {
             position: fixed;
-            top: 80px;
-            right: 20px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
+            bottom: 0;
+            left: 0;
+            z-index: 20;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            z-index: 90;
+            gap: 10px;
         }
         
         /* Ad Container */
         .ad-container {
             position: fixed;
-            bottom: 20px;
+            bottom: 60px;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
             max-width: 500px;
             padding: 15px;
-            border-radius: 12px;
+            border-radius: 18px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             align-items: center;
-            z-index: 95;
+            z-index: 15;
             animation: slideIn 0.5s ease-out;
         }
         
         @keyframes slideIn {
             from { bottom: -100px; opacity: 0; }
-            to { bottom: 20px; opacity: 1; }
+            to { bottom: 60px; opacity: 1; }
         }
         
         .ad-close {
@@ -339,130 +440,14 @@
             margin-bottom: 10px;
         }
         
-        .ad-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        
-        .ad-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        /* Feeling Selector Modal */
-        .feeling-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 200;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .feeling-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .feeling-content {
-            width: 90%;
-            max-width: 400px;
-            padding: 25px;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .feeling-title {
-            text-align: center;
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .feeling-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-        
-        .feeling-option {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            padding: 15px 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .feeling-option:hover {
-            background-color: rgba(59, 130, 246, 0.2);
-        }
-        
-        .feeling-emoji {
-            font-size: 30px;
-        }
-        
-        .feeling-name {
-            font-size: 14px;
-        }
-        
-        /* Comfort Verse Display */
-        .comfort-verse {
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-            text-align: center;
-        }
-        
-        .comfort-text {
-            font-size: 18px;
-            line-height: 1.6;
-            font-style: italic;
-        }
-        
-        .comfort-reference {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-        
-        .next-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 24px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-            margin-top: 20px;
-            align-self: center;
-        }
-        
-        .next-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
         /* Responsive Design */
         @media (max-width: 768px) {
-            .header {
-                padding: 12px 15px;
+            .feeling-title {
+                font-size: 24px;
+            }
+            
+            .feeling-emoji {
+                font-size: 32px;
             }
             
             .verse-text {
@@ -476,15 +461,13 @@
             .channel-btns {
                 gap: 12px;
             }
-            
-            .time-date {
-                top: 70px;
-                right: 15px;
-                font-size: 13px;
-            }
         }
         
         @media (max-width: 480px) {
+            .feeling-options {
+                grid-template-columns: 1fr;
+            }
+            
             .input-row {
                 flex-direction: column;
                 gap: 10px;
@@ -494,43 +477,81 @@
                 width: 100%;
             }
             
-            .feeling-options {
-                grid-template-columns: repeat(2, 1fr);
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
             }
             
-            .time-date {
-                position: static;
-                margin-bottom: 15px;
-                align-self: flex-end;
-                margin-right: 15px;
+            .action-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header glass">
-        <div class="logo-container">
-            <div class="logo">M</div>
-            <h2>Marisel Bible</h2>
+    <!-- Video Background -->
+    <video autoplay muted loop class="video-bg">
+        <source src="https://files.catbox.moe/zbf2x7.mp4" type="video/mp4">
+    </video>
+    
+    <!-- Feeling Page -->
+    <div class="page" id="feeling-page">
+        <div class="feeling-container glass">
+            <h1 class="feeling-title">How Are You Feeling Today?</h1>
+            <p class="feeling-subtitle">Select your mood to receive a comforting Bible verse</p>
+            
+            <div class="feeling-options">
+                <div class="feeling-option glass" data-feeling="happy">
+                    <span class="feeling-emoji">😊</span>
+                    <span class="feeling-name">Happy</span>
+                </div>
+                <div class="feeling-option glass" data-feeling="sad">
+                    <span class="feeling-emoji">😢</span>
+                    <span class="feeling-name">Sad</span>
+                </div>
+                <div class="feeling-option glass" data-feeling="depressed">
+                    <span class="feeling-emoji">😔</span>
+                    <span class="feeling-name">Depressed</span>
+                </div>
+                <div class="feeling-option glass" data-feeling="anxious">
+                    <span class="feeling-emoji">😰</span>
+                    <span class="feeling-name">Anxious</span>
+                </div>
+                <div class="feeling-option glass" data-feeling="angry">
+                    <span class="feeling-emoji">😠</span>
+                    <span class="feeling-name">Angry</span>
+                </div>
+                <div class="feeling-option glass" data-feeling="hopeful">
+                    <span class="feeling-emoji">🤗</span>
+                    <span class="feeling-name">Hopeful</span>
+                </div>
+            </div>
         </div>
-        <div class="channel-btns">
-            <button class="channel-btn wa-btn" id="whatsapp-btn">
-                <i class="fab fa-whatsapp"></i>
-            </button>
-            <button class="channel-btn yt-btn" id="youtube-btn">
-                <i class="fab fa-youtube"></i>
-            </button>
+        
+        <div class="comfort-container glass" id="comfort-container">
+            <div class="comfort-text" id="comfort-text"></div>
+            <div class="comfort-reference" id="comfort-reference"></div>
+            <button class="glass-btn" id="next-btn">Continue to Bible</button>
         </div>
     </div>
     
-    <!-- Time and Date Display -->
-    <div class="time-date glass" id="time-date">
-        <div id="current-time"></div>
-        <div id="current-date"></div>
-    </div>
-    
-    <div class="main">
-        <button id="feeling-btn" class="glass">How Do You Feel Today?</button>
+    <!-- Bible Page -->
+    <div class="page" id="bible-page">
+        <div class="header glass">
+            <div class="logo-container">
+                <div class="logo">B</div>
+                <h2>Bible Today</h2>
+            </div>
+            <div class="channel-btns">
+                <button class="channel-btn wa-btn" id="whatsapp-btn">
+                    <i class="fab fa-whatsapp"></i>
+                </button>
+                <button class="channel-btn yt-btn" id="youtube-btn">
+                    <i class="fab fa-youtube"></i>
+                </button>
+            </div>
+        </div>
         
         <div class="input-container glass">
             <div class="input-row">
@@ -548,7 +569,7 @@
                 <input type="text" id="chapter-input" class="input-field" placeholder="Chapter (e.g. 3)" autocomplete="off">
                 <input type="text" id="verse-input" class="input-field" placeholder="Verse (e.g. 16)" autocomplete="off">
             </div>
-            <button id="get-verse-btn" class="glass">Get Verse</button>
+            <button id="get-verse-btn" class="glass-btn">Get Verse</button>
         </div>
         
         <div class="verse-container glass">
@@ -560,16 +581,12 @@
             <div class="verse-reference" id="verse-reference"></div>
             
             <div class="action-buttons" id="action-buttons" style="display: none;">
-                <button class="action-btn glass" id="copy-btn">
+                <button class="action-btn" id="copy-btn">
                     <i class="far fa-copy"></i> Copy
                 </button>
-                <button class="action-btn glass" id="share-wa-btn">
+                <button class="action-btn" id="share-wa-btn">
                     <i class="fab fa-whatsapp"></i> Share
                 </button>
-            </div>
-            
-            <div class="share-link" id="share-link" style="display: none;">
-                Want to learn more about Christ? Visit <a href="https://bible-eight.vercel.app/" target="_blank">our website</a> for more Bible resources!
             </div>
         </div>
     </div>
@@ -577,59 +594,29 @@
     <!-- Ad Container -->
     <div class="ad-container glass" id="ad-container" style="display: none;">
         <button class="ad-close" id="ad-close"><i class="fas fa-times"></i></button>
-        <div class="ad-title">Support This Ministry</div>
+        <div class="ad-title">Support This Developer</div>
         <div class="ad-content">
             Help us continue providing free Bible resources by supporting the developer.
-            <br>MPESA Paybill: 247247 | Account: 254740007567
+            <br>MPESA | Account: 254740007567
         </div>
-        <button class="ad-btn" id="support-btn">I'll Support</button>
+        <button class="glass-btn" id="support-btn">Support Now</button>
     </div>
     
-    <!-- Feeling Selector Modal -->
-    <div class="feeling-modal" id="feeling-modal">
-        <div class="feeling-content glass">
-            <div class="feeling-title">How Are You Feeling Today?</div>
-            
-            <div id="feeling-selector">
-                <div class="feeling-options">
-                    <div class="feeling-option glass" data-feeling="happy">
-                        <span class="feeling-emoji">😊</span>
-                        <span class="feeling-name">Happy</span>
-                    </div>
-                    <div class="feeling-option glass" data-feeling="sad">
-                        <span class="feeling-emoji">😢</span>
-                        <span class="feeling-name">Sad</span>
-                    </div>
-                    <div class="feeling-option glass" data-feeling="depressed">
-                        <span class="feeling-emoji">😔</span>
-                        <span class="feeling-name">Depressed</span>
-                    </div>
-                    <div class="feeling-option glass" data-feeling="anxious">
-                        <span class="feeling-emoji">😰</span>
-                        <span class="feeling-name">Anxious</span>
-                    </div>
-                    <div class="feeling-option glass" data-feeling="angry">
-                        <span class="feeling-emoji">😠</span>
-                        <span class="feeling-name">Angry</span>
-                    </div>
-                    <div class="feeling-option glass" data-feeling="hopeful">
-                        <span class="feeling-emoji">🤗</span>
-                        <span class="feeling-name">Hopeful</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="comfort-verse" class="comfort-verse">
-                <div class="comfort-text" id="comfort-text"></div>
-                <div class="comfort-reference" id="comfort-reference"></div>
-                <button class="next-btn glass" id="next-btn">Continue to Bible</button>
-            </div>
-        </div>
+    <!-- Footer with Time -->
+    <div class="footer" id="footer">
+        <span id="current-time"></span> • <span>Marisel</span>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
+            const feelingPage = document.getElementById('feeling-page');
+            const biblePage = document.getElementById('bible-page');
+            const comfortContainer = document.getElementById('comfort-container');
+            const comfortText = document.getElementById('comfort-text');
+            const comfortReference = document.getElementById('comfort-reference');
+            const nextBtn = document.getElementById('next-btn');
+            const feelingOptions = document.querySelectorAll('.feeling-option');
             const bookSelect = document.getElementById('book-select');
             const testamentSelect = document.getElementById('testament-select');
             const chapterInput = document.getElementById('chapter-input');
@@ -640,25 +627,14 @@
             const placeholderText = document.querySelector('.placeholder-text');
             const loadingIndicator = document.querySelector('.loading');
             const actionButtons = document.getElementById('action-buttons');
-            const shareLink = document.getElementById('share-link');
             const copyBtn = document.getElementById('copy-btn');
             const shareWaBtn = document.getElementById('share-wa-btn');
             const whatsappBtn = document.getElementById('whatsapp-btn');
             const youtubeBtn = document.getElementById('youtube-btn');
-            const timeDateDisplay = document.getElementById('time-date');
-            const currentTime = document.getElementById('current-time');
-            const currentDate = document.getElementById('current-date');
+            const currentTimeDisplay = document.getElementById('current-time');
             const adContainer = document.getElementById('ad-container');
             const adClose = document.getElementById('ad-close');
             const supportBtn = document.getElementById('support-btn');
-            const feelingBtn = document.getElementById('feeling-btn');
-            const feelingModal = document.getElementById('feeling-modal');
-            const feelingOptions = document.querySelectorAll('.feeling-option');
-            const feelingSelector = document.getElementById('feeling-selector');
-            const comfortVerse = document.getElementById('comfort-verse');
-            const comfortText = document.getElementById('comfort-text');
-            const comfortReference = document.getElementById('comfort-reference');
-            const nextBtn = document.getElementById('next-btn');
             
             // Bible verses for different feelings
             const comfortVerses = {
@@ -757,19 +733,40 @@
                 "Jude", "Revelation"
             ];
             
-            // Update time and date
-            function updateTimeDate() {
+            // Update time
+            function updateTime() {
                 const now = new Date();
-                const timeOptions = { hour: '2-digit', minute: '2-digit' };
-                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
                 
-                currentTime.textContent = now.toLocaleTimeString(undefined, timeOptions);
-                currentDate.textContent = now.toLocaleDateString(undefined, dateOptions);
+                currentTimeDisplay.textContent = `${hours}:${minutes}:${seconds}`;
             }
             
-            // Update immediately and then every minute
-            updateTimeDate();
-            setInterval(updateTimeDate, 60000);
+            // Update immediately and then every second
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // Feeling option selection
+            feelingOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const feeling = this.dataset.feeling;
+                    const verses = comfortVerses[feeling];
+                    const randomVerse = verses[Math.floor(Math.random() * verses.length)];
+                    
+                    comfortText.textContent = randomVerse.text;
+                    comfortReference.textContent = randomVerse.reference;
+                    
+                    document.querySelector('.feeling-container').style.display = 'none';
+                    comfortContainer.style.display = 'flex';
+                });
+            });
+            
+            // Next button to Bible page
+            nextBtn.addEventListener('click', function() {
+                feelingPage.style.display = 'none';
+                biblePage.style.display = 'flex';
+            });
             
             // Populate book select based on testament
             testamentSelect.addEventListener('change', function() {
@@ -791,7 +788,7 @@
                 const ads = [
                     {
                         title: "Follow Our Channel",
-                        content: "Stay updated with daily Bible verses and devotionals by following our WhatsApp channel.",
+                        content: "Following our WhatsApp channel.",
                         buttonText: "Follow Now",
                         action: function() {
                             window.open('https://whatsapp.com/channel/0029Vajvy2kEwEjwAKP4SI0x', '_blank');
@@ -799,7 +796,7 @@
                     },
                     {
                         title: "Support This Ministry",
-                        content: "Help us continue providing free Bible resources by supporting the developer. MPESA Paybill: 247247 | Account: 254740007567",
+                        content: "Supporting the developer. MPESA | Account: 254740007567",
                         buttonText: "I'll Support",
                         action: function() {
                             alert("Thank you for your support! God bless you.");
@@ -807,7 +804,7 @@
                     },
                     {
                         title: "Watch Our Videos",
-                        content: "Visit our YouTube channel for inspiring Bible teachings and stories.",
+                        content: "Visit our YouTube Channel",
                         buttonText: "Subscribe Now",
                         action: function() {
                             window.open('https://youtube.com/@wemacomic', '_blank');
@@ -845,40 +842,6 @@
             
             // Show new ad every 2 minutes
             setInterval(showRandomAd, 120000);
-            
-            // Feeling selector
-            feelingBtn.addEventListener('click', function() {
-                feelingModal.classList.add('active');
-                comfortVerse.style.display = 'none';
-                feelingSelector.style.display = 'grid';
-            });
-            
-            // Feeling option selection
-            feelingOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const feeling = this.dataset.feeling;
-                    const verses = comfortVerses[feeling];
-                    const randomVerse = verses[Math.floor(Math.random() * verses.length)];
-                    
-                    comfortText.textContent = randomVerse.text;
-                    comfortReference.textContent = randomVerse.reference;
-                    
-                    feelingSelector.style.display = 'none';
-                    comfortVerse.style.display = 'flex';
-                });
-            });
-            
-            // Next button
-            nextBtn.addEventListener('click', function() {
-                feelingModal.classList.remove('active');
-            });
-            
-            // Close modal when clicking outside
-            feelingModal.addEventListener('click', function(e) {
-                if (e.target === feelingModal) {
-                    feelingModal.classList.remove('active');
-                }
-            });
             
             // Channel links
             whatsappBtn.addEventListener('click', function() {
@@ -948,7 +911,6 @@
                 verseText.style.display = 'none';
                 verseReference.style.display = 'none';
                 actionButtons.style.display = 'none';
-                shareLink.style.display = 'none';
                 loadingIndicator.style.display = 'flex';
                 
                 try {
@@ -969,17 +931,15 @@
                         verseText.style.display = 'block';
                         verseReference.style.display = 'block';
                         actionButtons.style.display = 'flex';
-                        shareLink.style.display = 'block';
                         placeholderText.style.display = 'none';
                     } else {
                         throw new Error("No verse text in response");
                     }
                 } catch (error) {
-                    console.error('Error fetching Bible verse:', error);
+                    console.error('Bible verse Not Found:', error);
                     placeholderText.textContent = "Failed to fetch verse. Please try again.";
                     placeholderText.style.display = 'block';
                     actionButtons.style.display = 'none';
-                    shareLink.style.display = 'none';
                 } finally {
                     loadingIndicator.style.display = 'none';
                 }
