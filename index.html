@@ -540,7 +540,7 @@
     <div class="page" id="bible-page">
         <div class="header glass">
             <div class="logo-container">
-                <div class="logo">B</div>
+                <div class="logo">🏆</div>
                 <h2>Bible Today</h2>
             </div>
             <div class="channel-btns">
@@ -596,7 +596,7 @@
         <button class="ad-close" id="ad-close"><i class="fas fa-times"></i></button>
         <div class="ad-title">Support This Developer</div>
         <div class="ad-content">
-            Help us continue providing free Bible resources by supporting the developer.
+          Supporting the developer.
             <br>MPESA | Account: 254740007567
         </div>
         <button class="glass-btn" id="support-btn">Support Now</button>
@@ -887,11 +887,11 @@
                 
                 // Format text with WhatsApp bold syntax
                 const formattedVerse = verse.split(' ').map(word => 
-                    word.length > 3 ? `*${word}*` : word
+                    word.length > 3 ? `${word}` : word
                 ).join(' ');
                 
                 const message = encodeURIComponent(
-                    `${formattedVerse}\n\n${reference}\n\n*Want to learn more about Christ? Visit https://bible-eight.vercel.app/*`
+                    `_${formattedVerse}_\n\n${reference}\n\n*Want to learn more about Christ? Visit https://bible-eight.vercel.app/*`
                 );
                 window.open(`https://wa.me/?text=${message}`, '_blank');
             });
@@ -937,7 +937,7 @@
                     }
                 } catch (error) {
                     console.error('Bible verse Not Found:', error);
-                    placeholderText.textContent = "Failed to fetch verse. Please try again.";
+                    placeholderText.textContent = "No Such Verse Try Another Chapter.";
                     placeholderText.style.display = 'block';
                     actionButtons.style.display = 'none';
                 } finally {
